@@ -7,6 +7,7 @@ namespace GraphQlDirector.Graphql
     public class Query
     {
         [UseDbContext(typeof(ApiDbContext))]
+        [UsePaging]
         [UseProjection]
         [UseFiltering]
         [UseSorting]
@@ -21,7 +22,7 @@ namespace GraphQlDirector.Graphql
         [UseSorting]
         public IQueryable<Director> GetDirectors([ScopedService] ApiDbContext context)
         {
-            return context.Directores;
+            return context.Directores!;
         }
     }
 }

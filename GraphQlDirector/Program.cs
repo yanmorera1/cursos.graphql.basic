@@ -5,22 +5,29 @@ using HotChocolate.AspNetCore.Playground;
 using HotChocolate.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using GraphQlDirector.Graphql.DataVideo;
+using GraphQlDirector.Graphql.DataDirector;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
 
-builder.Services.AddPooledDbContextFactory<ApiDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
+//DbContext added into a pooled factory
+builder.Services.AddPooledDbContextFactory<ApiDbContext>
+    (options => options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionString")));
+
+Type[] types =
+{
+    typeof(VideoType),
+    typeof(DirectorType)
+};
 
 builder.Services.AddGraphQLServer()
     .AddQueryType<Query>()
-    .AddType<VideoType>()
+    .AddTypes(types)
     .AddProjections()
+    .AddMutationType<Mutation>()
     .AddFiltering()
     .AddSorting();
 
@@ -46,6 +53,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapGraphQL();
 });
 
+//Configuring voyager (graphql interface)
 app.UseGraphQLVoyager("graphql-ui", new VoyagerOptions
 {
     GraphQLEndPoint = "/graphql"
